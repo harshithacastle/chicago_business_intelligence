@@ -20,7 +20,8 @@ steps:
 - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
   entrypoint: gcloud
   args: ['run', 'deploy','go-microservice', '--image','gcr.io/automatic-gamma-348318/go-microservice', '--region','us-central1', '--add-cloudsql-instances', 'automatic-gamma-348318:us-central1:mypostgres1','--platform','managed', '--port','8080', '--allow-unauthenticated']
-  images:
+images:
 - gcr.io/automatic-gamma-348318/go-microservice
 - gcr.io/automatic-gamma-348318/pgadmin
+
 
