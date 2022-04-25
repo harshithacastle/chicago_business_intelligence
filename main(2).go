@@ -174,7 +174,7 @@ func main() {
 
 	//Option 4
 	//Database application running on Google Cloud Platform.
-	db_connection := "user=postgres dbname=chicago_business_intelligence password=1234 host=/cloudsql/automatic-gamma-348318:us-central1:mypostgres1 sslmode=disable port = 5432"
+	db_connection := "user=postgres dbname=chicago_business_intelligence password=1234 host=/cloudsql/automatic-gamma-348318:us-central1-f:mypostgres1 sslmode=disable port = 5432"
 
 	db, err := sql.Open("postgres", db_connection)
 	if err != nil {
