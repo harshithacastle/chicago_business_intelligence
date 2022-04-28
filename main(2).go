@@ -12,14 +12,6 @@ package main
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-
-// The following is a sample record from the Taxi Trips dataset retrieved from the City of Chicago Data Portal
-
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-
 // trip_id	"c354c843908537bbf90997917b714f1c63723785"
 // trip_start_timestamp	"2021-11-13T22:45:00.000"
 // trip_end_timestamp	"2021-11-13T23:00:00.000"
@@ -53,15 +45,14 @@ package main
 ////////////////////////////////////////////////////////////////////////////////////
 
 import (
-	"database/sql"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
+
+	"database/sql"
+	"encoding/json"
 
 	"github.com/kelvins/geocoder"
 	_ "github.com/lib/pq"
@@ -157,14 +148,16 @@ type BuildingPermitsJsonRecords []struct {
 
 func main() {
 
+	//time.Sleep(24 * time.Hour)
+
 	// Establish connection to Postgres Database
 
 	// OPTION 1 - Postgress application running on localhost
-	//db_connection := "user=postgres dbname=chicago_business_intelligence password=root host=localhost sslmode=disable port = 5432"
+	//db_connection := "user=postgres dbname=check password=1234 host=localhost sslmode=disable"
 
 	// OPTION 2
 	// Docker container for the Postgres microservice - uncomment when deploy with host.docker.internal
-	//db_connection := "user=postgres dbname=chicago_business_intelligence password=root host=host.docker.internal sslmode=disable port = 5433"
+	//db_connection := "user=postgres dbname=chicago_business_intelligence password=1234 host=host.docker.internal sslmode=disable port=5433"
 
 	// OPTION 3
 	// Docker container for the Postgress microservice - uncomment when deploy with IP address of the container
@@ -181,18 +174,12 @@ func main() {
 		panic(err)
 	}
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
-
 	// Test the database connection
-	//err = db.Ping()
-	//if err != nil {
-	//	fmt.Println("Couldn't Connect to database")
-	//	panic(err)
-	//}
+	err = db.Ping()
+	if err != nil {
+		fmt.Println("Couldn't Connect to database")
+		panic(err)
+	}
 
 	// Spin in a loop and pull data from the city of chicago data portal
 	// Once every hour, day, week, etc.
@@ -217,10 +204,6 @@ func main() {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 func GetTaxiTrips(db *sql.DB) {
-
-	// This function is NOT complete
-	// It provides code-snippets for the data source: https://data.cityofchicago.org/Transportation/Taxi-Trips/wrvz-psew
-	// You need to complete the implmentation and add the data source: https://data.cityofchicago.org/Transportation/Transportation-Network-Providers-Trips/m6dm-c72p
 
 	// Data Collection needed from two data sources:
 	// 1. https://data.cityofchicago.org/Transportation/Taxi-Trips/wrvz-psew
@@ -262,7 +245,7 @@ func GetTaxiTrips(db *sql.DB) {
 
 	// While doing unit-testing keep the limit value to 500
 	// later you could change it to 1000, 2000, 10,000, etc.
-	var url = "https://data.cityofchicago.org/resource/wrvz-psew.json?$limit=500"
+	var url = "https://data.cityofchicago.org/resource/wrvz-psew.json?$limit=1000"
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -388,9 +371,6 @@ func GetTaxiTrips(db *sql.DB) {
 func GetUnemploymentRates(db *sql.DB) {
 	fmt.Println("GetUnemploymentRates: Collecting Unemployment Rates Data")
 
-	// This function is NOT complete
-	// It provides code-snippets for the data source: https://data.cityofchicago.org/Health-Human-Services/Public-Health-Statistics-Selected-public-health-in/iqnk-2tcu/data
-
 	// Data Collection needed from two data sources:
 	// 1. https://data.cityofchicago.org/Health-Human-Services/Public-Health-Statistics-Selected-public-health-in/iqnk-2tcu/data
 
@@ -451,7 +431,7 @@ func GetUnemploymentRates(db *sql.DB) {
 
 	// While doing unit-testing keep the limit value to 500
 	// later you could change it to 1000, 2000, 10,000, etc.
-	var url = "https://data.cityofchicago.org/resource/iqnk-2tcu.json?$limit=500"
+	var url = "https://data.cityofchicago.org/resource/iqnk-2tcu.json?$limit=1000"
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -704,9 +684,6 @@ func GetUnemploymentRates(db *sql.DB) {
 func GetBuildingPermits(db *sql.DB) {
 	fmt.Println("GetBuildingPermits: Collecting Building Permits Data")
 
-	// This function is NOT complete
-	// It provides code-snippets for the data source: https://data.cityofchicago.org/Buildings/Building-Permits/ydr8-5enu/data
-
 	// Data Collection needed from data source:
 	// https://data.cityofchicago.org/Buildings/Building-Permits/ydr8-5enu/data
 
@@ -770,7 +747,7 @@ func GetBuildingPermits(db *sql.DB) {
 
 	// While doing unit-testing keep the limit value to 500
 	// later you could change it to 1000, 2000, 10,000, etc.
-	var url = "https://data.cityofchicago.org/resource/building-permits.json?$limit=500"
+	var url = "https://data.cityofchicago.org/resource/building-permits.json?$limit=1500"
 
 	res, err := http.Get(url)
 	if err != nil {
