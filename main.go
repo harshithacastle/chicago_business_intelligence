@@ -12,6 +12,14 @@ package main
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+// The following is a sample record from the Taxi Trips dataset retrieved from the City of Chicago Data Portal
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
 // trip_id	"c354c843908537bbf90997917b714f1c63723785"
 // trip_start_timestamp	"2021-11-13T22:45:00.000"
 // trip_end_timestamp	"2021-11-13T23:00:00.000"
@@ -45,14 +53,15 @@ package main
 ////////////////////////////////////////////////////////////////////////////////////
 
 import (
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"strconv"
-	"time"
-
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
 
 	"github.com/kelvins/geocoder"
 	_ "github.com/lib/pq"
@@ -148,16 +157,14 @@ type BuildingPermitsJsonRecords []struct {
 
 func main() {
 
-	//time.Sleep(24 * time.Hour)
-
 	// Establish connection to Postgres Database
 
 	// OPTION 1 - Postgress application running on localhost
-	//db_connection := "user=postgres dbname=check password=1234 host=localhost sslmode=disable"
+	//db_connection := "user=postgres dbname=chicago_business_intelligence password=root host=localhost sslmode=disable port = 5432"
 
 	// OPTION 2
 	// Docker container for the Postgres microservice - uncomment when deploy with host.docker.internal
-	//db_connection := "user=postgres dbname=chicago_business_intelligence password=1234 host=host.docker.internal sslmode=disable port=5433"
+	//db_connection := "user=postgres dbname=chicago_business_intelligence password=root host=host.docker.internal sslmode=disable port = 5433"
 
 	// OPTION 3
 	// Docker container for the Postgress microservice - uncomment when deploy with IP address of the container
@@ -174,6 +181,12 @@ func main() {
 		panic(err)
 	}
 
+	//port := os.Getenv("PORT")
+	//if port == "" {
+	//	port = "8080"
+	//}
+	//log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+
 	// Test the database connection
 	err = db.Ping()
 	if err != nil {
@@ -188,9 +201,15 @@ func main() {
 	for {
 		// build and fine-tune functions to pull data from different data sources
 		// This is a code snippet to show you how to pull data from different data sources//.
-		GetTaxiTrips(db)
-		GetUnemploymentRates(db)
-		GetBuildingPermits(db)
+		//GetTaxiTrips(db)
+		//GetUnemploymentRates(db)
+		//GetBuildingPermits(db)
+
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = "8080"
+		}
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 
 		// Pull the data once a day
 		// You might need to pull Taxi Trips and COVID data on daily basis
@@ -198,12 +217,22 @@ func main() {
 		time.Sleep(24 * time.Hour)
 	}
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
 func GetTaxiTrips(db *sql.DB) {
+
+	// This function is NOT complete
+	// It provides code-snippets for the data source: https://data.cityofchicago.org/Transportation/Taxi-Trips/wrvz-psew
+	// You need to complete the implmentation and add the data source: https://data.cityofchicago.org/Transportation/Transportation-Network-Providers-Trips/m6dm-c72p
 
 	// Data Collection needed from two data sources:
 	// 1. https://data.cityofchicago.org/Transportation/Taxi-Trips/wrvz-psew
@@ -370,6 +399,9 @@ func GetTaxiTrips(db *sql.DB) {
 
 func GetUnemploymentRates(db *sql.DB) {
 	fmt.Println("GetUnemploymentRates: Collecting Unemployment Rates Data")
+
+	// This function is NOT complete
+	// It provides code-snippets for the data source: https://data.cityofchicago.org/Health-Human-Services/Public-Health-Statistics-Selected-public-health-in/iqnk-2tcu/data
 
 	// Data Collection needed from two data sources:
 	// 1. https://data.cityofchicago.org/Health-Human-Services/Public-Health-Statistics-Selected-public-health-in/iqnk-2tcu/data
@@ -683,6 +715,9 @@ func GetUnemploymentRates(db *sql.DB) {
 
 func GetBuildingPermits(db *sql.DB) {
 	fmt.Println("GetBuildingPermits: Collecting Building Permits Data")
+
+	// This function is NOT complete
+	// It provides code-snippets for the data source: https://data.cityofchicago.org/Buildings/Building-Permits/ydr8-5enu/data
 
 	// Data Collection needed from data source:
 	// https://data.cityofchicago.org/Buildings/Building-Permits/ydr8-5enu/data
